@@ -8,13 +8,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TheAndroidMaster/mdjavadoc.git"
+    "url": "https://github.com/simon-milleto/mdjavadoc.git"
   },
   "author": "James Fenn <dev@jfenn.me> (https://jfenn.me/)",
   "license": "MIT",
   "email": "dev@jfenn.me",
   "bugs": {
-    "url": "https://github.com/TheAndroidMaster/mdjavadoc/issues"
+    "url": "https://github.com/simon-milleto/mdjavadoc/issues"
   },
-  "homepage": "https://github.com/TheAndroidMaster/mdjavadoc#readme"
+  "homepage": "https://github.com/simon-milleto/mdjavadoc#readme"
 }

@@ -7,14 +7,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "TheAndroidMaster/mdjavadoc",
+  "repository": "simon-milleto/mdjavadoc",
   "author": "James Fenn <dev@jfenn.me> (https://jfenn.me/)",
   "license": "MIT",
-  "url": "https://github.com/TheAndroidMaster/mdjavadoc/issues",
+  "url": "https://github.com/simon-milleto/mdjavadoc/issues",
   "homepage": "https://jfenn.me/projects/mdjavadoc",
   "email": "dev@jfenn.me",
   "dependencies": {
     "commander": "^2.18.0",
-    "mdjavadoc-api": "^1.0.4"
+    "mdjavadoc-api": "file:../api/index.js"
   }
 }
