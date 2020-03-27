@@ -9,7 +9,7 @@ const DEFAULT_INDEX_LENGTH = 3;
 const tags = {
 	author: ["Name"],
 	version: ["Current Version"],
-	param: ["Parameter Name", "Description"],
+	param: ["Parameter Name", "Type", "Description"],
 	"return": ["Returned Value"],
 	exception: ["Exception", "Description"],
 	throws: ["Exception", "Description"],
@@ -174,6 +174,7 @@ function formMarkdown(data, fileName, options) {
 		if (data[i].type.includes("class"))
 			markdown += "# ";
 		else markdown += "## ";
+
 		markdown += "[" + data[i].name + "](" + data[i].source + ")" + "\n\n";
 			
 		if (data[i].type.length > 0)
@@ -199,7 +200,7 @@ function formMarkdown(data, fileName, options) {
 			markdown += "\n";
 		}
 	}
-	
+
 	if (options.template) {
 		let template = _fs.readFileSync(_path.resolve(options.template), "utf8");
 		return template.replace(/\s\{{2}\s*content\s*\}{2}\s/g, markdown)
@@ -379,26 +380,28 @@ function parseFile(file, prefix, options) {
 	let content = _fs.readFileSync(_path.resolve(file), "utf8");
 	let reg = /(?<=\s\/\*\*\s)([\s\S]*?)(?=\s\*\/\s)/g;
 	let match;
+	loop1:
 	while ((match = reg.exec(content)) !== null) {
 		let matchText = match[0];
 		let startIndex = match.index + match[0].length;
 		startIndex += content.substring(startIndex).indexOf("\n") + 1;
 		let declaration = content.substring(startIndex, startIndex + content.substring(startIndex).indexOf("\n"));
 		let type = [];
-		
+		let name = '';
 		while (declaration.trim().startsWith("@")) {
 			type = type.concat("@" + (/([A-Z0-9a-z]*)/g).exec(declaration.trim().substring(1))[1]);
 			
 			startIndex += declaration.length + 1;
 			declaration = content.substring(startIndex, startIndex + content.substring(startIndex).indexOf("\n"));
 		}
-		
+
+		name = (/([a-zA-Z]*\(.*\))/).exec(declaration);
 		type = type.concat((/([A-Z0-9a-z\.\<\> ]*)/g).exec(declaration.trim())[1].trim().split(" "));
-		
 		let doc = {
-			name: type.pop(),
+			name: name && name.length ? name[0] : type.pop(),
 			description: "",
 			type: type,
+			status: '',
 			source: options.sourcePrefix + "/" + prefix.split(".").join("/") + "/" + fileName + "#L" + getLineNumber(content, match.index)
 		};
 
@@ -411,6 +414,9 @@ function parseFile(file, prefix, options) {
 				tag = line.substring(1, spaceIndex);
 				line = line.substring(spaceIndex + 1);
 				let phrase = null;
+				if (tag === 'status' && line === 'private') {
+					continue loop1;
+				}
 				if (tags[tag]) {
 					let object = {
 						content: line,
@@ -444,10 +450,13 @@ function parseFile(file, prefix, options) {
 			} else if (tag) {
 				let object = doc[tag][doc[tag].length - 1];
 				let words = line.split(/[ \t]{1,}/g);
-				for (let word in words) {
-					if (object.values.length < tags[tag].length)
-						object.values.push(words[word]);
-					else object.values[object.values.length - 1] += " " + words[word];
+
+				if (object) {
+					for (let word in words) {
+						if (object.values.length < tags[tag].length)
+							object.values.push(words[word]);
+						else object.values[object.values.length - 1] += " " + words[word];
+					}
 				}
 			} else {
 				if (line.trim().length > 0) {
